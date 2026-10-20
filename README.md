@@ -45,3 +45,10 @@ Two points were ambiguous. The library picks one reading for each:
 This sentinel tracks a single sequence counter. It does not deduplicate by message content. If you observe `"a"`, `"b"`, `"c"` with `threshold=3`, the third call emits a summary with `count=3` and `message="c"`. If you need per-message tracking, maintain one sentinel per message key.
 
 The quiet window is checked at observation time, not proactively. If no messages arrive after the threshold is reached, suppression simply continues indefinitely; there is no timer that fires on its own.
+
+## Performance
+
+The window keeps a bounded buffer, so `push` is constant time and memory does not
+grow with the length of the stream. `peak` and `trough` are linear in the window
+size, which is the trade that keeps `push` cheap.
+
